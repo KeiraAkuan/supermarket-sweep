@@ -17,15 +17,27 @@ function createTextSprite () {
     textSprite.setPosition(0, 0)
     textSprite.left = 0
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`tile10`, function (sprite, location) {
+	let display = " Subtotal: $" + subtotal
+    game.showLongText(display, DialogLayout.Center)
+
+    info.setScore(subtotal)
+    game.over(true)
+})
 function addToCart (grocery: Sprite) {
     item = sprites.create(grocery.image, SpriteKind.CartItem)
     item.follow(player)
     item.x = player.x
     item.y = player.y
-
-    let cost = sprites.readDataNumber(grocery, "cost")
+    cost = sprites.readDataNumber(grocery, "cost")
     subtotal += cost
     textSprite.setText("$" + subtotal)
+    weight = sprites.readDataNumber(grocery, "weight")
+    speed += 0 - weight
+    if (speed < 50) {
+        speed = 50
+    }
+    controller.moveSprite(player, speed, speed)
 }
 function createProduct (productImg: Image, cost: number, weight: number, name: string) {
     p = sprites.create(productImg, SpriteKind.Grocery)
@@ -33,25 +45,27 @@ function createProduct (productImg: Image, cost: number, weight: number, name: s
     sprites.setDataNumber(p, "weight", weight)
     sprites.setDataString(p, "name", name)
     tiles.placeOnRandomTile(p, assets.tile`tile1`)
-
-  
 }
 function createAllProducts () {
     for (let i = 0; i <= groceryImages.length - 1; i++) {
         image2 = groceryImages[i]
         name = groceryNames[i]
-        cost = groceryCosts[i]
-        weight = groceryWeights[i]
-        createProduct(image2, cost, weight, name)
+        cost2 = groceryCosts[i]
+        weight2 = groceryWeights[i]
+        createProduct(image2, cost2, weight2, name)
     }
 }
-let weight = 0
-let cost = 0
+let weight2 = 0
+let cost2 = 0
 let name = ""
 let image2: Image = null
 let p: Sprite = null
+let weight = 0
+let subtotal = 0
+let cost = 0
 let item: Sprite = null
 let textSprite: TextSprite = null
+let speed = 0
 let player: Sprite = null
 let groceryCosts: number[] = []
 let groceryWeights: number[] = []
@@ -278,7 +292,8 @@ player = sprites.create(img`
     .d..d......ddddddd...........
     .d..dd......c....c...........
     `, SpriteKind.Player)
-controller.moveSprite(player)
+speed = 100
+controller.moveSprite(player, speed, speed)
 scene.cameraFollowSprite(player)
 tiles.placeOnTile(player, tiles.getTileLocation(0, 3))
 createProduct(img`
@@ -301,4 +316,3 @@ createProduct(img`
     `, 1, 1, "Toy Car")
 createAllProducts()
 createTextSprite()
-let subtotal = 0
